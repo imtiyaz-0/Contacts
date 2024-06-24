@@ -23,21 +23,24 @@ const duser = { username: 'saltman', password: 'oai1122' };
 const JWT_SECRET = 'as2809';
 
 const algorithm = 'aes-256-ctr';
-const secretKey = 'as2809keyas2809keyas2809keyas2809key';
+const secretKey = crypto.randomBytes(32); 
+const iv = Buffer.from('1234567890123456', 'utf8'); 
 
 const encrypt = (text) => {
-  const cipher = crypto.createCipher(algorithm, secretKey);
+  const iv = crypto.randomBytes(16);
+  const cipher = crypto.createCipheriv('aes-256-ctr', secretKey, iv);
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return encrypted;
 };
 
-const decrypt = (text) => {
-  const decipher = crypto.createDecipher(algorithm, secretKey);
-  let decrypted = decipher.update(text, 'hex', 'utf8');
+const decrypt = (hash) => {
+  const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(hash.iv, 'hex'));
+  let decrypted = decipher.update(hash.content, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
 };
+
 
 const verifyToken = (req, res, next) => {
   const authHeader = req.headers['authorization'];
