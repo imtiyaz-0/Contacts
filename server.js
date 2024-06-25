@@ -23,20 +23,19 @@ const duser = { username: 'saltman', password: 'oai1122' };
 const JWT_SECRET = 'as2809';
 
 const algorithm = 'aes-256-ctr';
-const secretKey = crypto.randomBytes(32); 
-const iv = Buffer.from('1234567890123456', 'utf8'); 
+const secretKey = "ThisIsASecureSecretKey123!@#asdf";
+const iv = Buffer.from('1234567890123456', 'utf8');  // Fixed IV
 
 const encrypt = (text) => {
-  const iv = crypto.randomBytes(16);
-  const cipher = crypto.createCipheriv('aes-256-ctr', secretKey, iv);
+  const cipher = crypto.createCipheriv(algorithm, secretKey, iv);
   let encrypted = cipher.update(text, 'utf8', 'hex');
   encrypted += cipher.final('hex');
   return encrypted;
 };
 
 const decrypt = (hash) => {
-  const decipher = crypto.createDecipheriv(algorithm, secretKey, Buffer.from(hash.iv, 'hex'));
-  let decrypted = decipher.update(hash.content, 'hex', 'utf8');
+  const decipher = crypto.createDecipheriv(algorithm, secretKey, iv);
+  let decrypted = decipher.update(hash, 'hex', 'utf8');
   decrypted += decipher.final('utf8');
   return decrypted;
 };
